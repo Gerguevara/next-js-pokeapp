@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
 
 import { Button } from "@nextui-org/react";
+import { Layout } from "../components/layouts";
 
 const Home: NextPage = () => {
   return (
     <>
-      <Button>Click me</Button>
+      <Layout>Click me</Layout>
     </>
   );
 };

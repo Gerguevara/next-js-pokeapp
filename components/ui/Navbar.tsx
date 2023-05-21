@@ -1,46 +1,45 @@
-import Image from 'next/image';
-import NextLink from 'next/link';
-import { Spacer, Text, useTheme, Link } from '@nextui-org/react';
-
+import Image from "next/image";
+import NextLink from "next/link";
+import { Spacer, Text, useTheme, Link } from "@nextui-org/react";
 
 export const Navbar = () => {
+  const { theme } = useTheme();
 
-    const { theme } = useTheme()
+  return (
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "start",
+        padding: "0x 50px",
+        backgroundColor: theme?.colors.gray500.value,
+      }}
+    >
+      <Image
+        // next js by default use static generation, due that  it request a setup ion next.cong to allow images fetching
+        // from another server, by default it looks for the resource into this server, and throw an error if it's not found
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png"
+        alt="icono de la app"
+        width={70}
+        height={70}
+      />
 
-    return (
-        <div style={{
-            display: 'flex',
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'start',
-            padding: '0x 50px',
-            backgroundColor: theme?.colors.gray900.value
-        }}>
-            <Image 
-            // next js by default use static generation, due that  it request a setup ion next.cong to allow images fetching
-            // from another server, by default it looks for the resource into this server, and throw an error if it's not found
-                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png"
-                alt="icono de la app"
-                width={70}
-                height={70}
-            />
+      <Link href="/">
+        <Text color="white" h2>
+          P
+        </Text>
+        <Text color="white" h3>
+          okémon!
+        </Text>
+      </Link>
 
-            <NextLink href="/" passHref>
-                <Link>
-                    <Text color='white' h2>P</Text>
-                    <Text color='white' h3>okémon!</Text>
-                </Link>
-            </NextLink>
+      <Spacer css={{ flex: 1 }} />
 
-            <Spacer css={{ flex: 1 }}/>
-            
-            <NextLink href="/favorites" passHref>
-                <Link css={{ marginRight: '10px' }}>
-                    <Text color='white'>Favoritos</Text>
-                </Link>
-            </NextLink>
-
-        </div>
-    )
+      <Link css={{ marginRight: "10px" }} href="/favorites">
+        <Text color="white">Favoritos</Text>
+      </Link>
+    </div>
+  );
 };
