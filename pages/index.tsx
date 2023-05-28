@@ -3,32 +3,32 @@ import type { NextPage } from "next";
 import { Button } from "@nextui-org/react";
 import { Layout } from "../components/layouts";
 import { useEffect } from "react";
+import {pokeApi} from "../api";
+import { PokemonListResponse, SmallPokemon } from "../interfaces";
 
-const Home: NextPage = ({name}: any) => {
+interface Props{
+  pokemons: SmallPokemon[];
+}
+
+const Home: NextPage<Props> = ({pokemons}: any) => {
 
   useEffect(() => {
-    console.log(name);
+    console.log(pokemons);
   })
   return (
-    <>
       <Layout>
-        <Button>Click me!</Button>
+        <ul>
+          <li></li>
+        </ul>
       </Layout>
-    </>
   );
 };
 
-//las props que se pasen aca son utilizadas  por el componente
-// en la linea 6
-
-// get static props solo se ejecuta en el lado del servidor y solo el build time
-
-
-// get static props solo se puede utilizar en pages
-export const getServerSideProps =  (context: any) => {
+export const getServerSideProps =  async (context: any) => {
+ const {data} = await pokeApi.get<PokemonListResponse>('/pokemon?limit=151')
   return {
     props: {
-      name: 'Gerardo'
+      pokemons: data.results
     },
   };
 };
