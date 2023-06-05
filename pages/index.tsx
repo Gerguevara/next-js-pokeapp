@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import type { GetStaticProps, NextPage } from "next";
 import { Grid } from "@nextui-org/react";
 import { Layout } from "../components/layouts";
 import { useEffect } from "react";
@@ -25,7 +25,7 @@ const Home: NextPage<Props> = ({ pokemons }: any) => {
   );
 };
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps: GetStaticProps  = async (context: any) => {
   const { data } = await pokeApi.get<PokemonListResponse>("/pokemon?limit=151");
   const pokemons: SmallPokemon[] = data.results.map((pokemon, index) => ({
     ...pokemon,

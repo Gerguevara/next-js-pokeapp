@@ -1,5 +1,4 @@
 import Image from "next/image";
-import NextLink from "next/link";
 import { Spacer, Text, useTheme, Link } from "@nextui-org/react";
 
 export const Navbar = () => {
@@ -27,11 +26,8 @@ export const Navbar = () => {
       />
 
       <Link href="/">
-        <Text color="white" h2>
-          P
-        </Text>
-        <Text color="white" h3>
-          okémon!
+        <Text color="white" h2>P</Text>
+        <Text color="white" h3>okémon!
         </Text>
       </Link>
 
