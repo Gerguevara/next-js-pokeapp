@@ -1,0 +1,1 @@
+export {default as localStorageHandler} from './localStorageHandler'
