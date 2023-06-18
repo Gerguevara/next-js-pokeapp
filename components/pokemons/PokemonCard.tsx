@@ -13,7 +13,7 @@ const PokemonCard: FC<Props> = ({pokemon}: Props) => {
   const router = useRouter();
   const onClick = () => {
     // hace la navegacion
-    router.push(`/pokemon/${pokemon.id}`);
+    router.push(`/pokemon/${pokemon.name}`);
   };
  
 

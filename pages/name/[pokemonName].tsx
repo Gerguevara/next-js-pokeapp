@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Layout } from "../../components/layouts";
 import { NextPage, GetStaticPaths, GetStaticProps } from "next";
-import { Button, Card, Container, Grid, Image, Text } from "@nextui-org/react";
 import confetti from "canvas-confetti";
-import { Pokemon } from "../../interfaces";
+import { Pokemon, PokemonListResponse } from "../../interfaces";
+import { Button, Card, Container, Grid, Image, Text } from "@nextui-org/react";
 import { localStorageHandler } from "../../utils";
-import getPokemonOptimizedInfo from "../../utils/optimizePokemonInfo";
+import pokeAPi from "../../api/pokeApi";
 
 interface Props {
   pokemon: Pokemon;
 }
 
-const PokemonDetail: NextPage<Props> = ({ pokemon }) => {
+const PokemonByNamePage: NextPage<Props> = ({ pokemon }) => {
 
   const [isInFavorites, setIsInFavorites] = useState(localStorageHandler.existInFavorites(pokemon.id))
 
@@ -95,11 +95,12 @@ const PokemonDetail: NextPage<Props> = ({ pokemon }) => {
 
 // lo que se construye con getStaticPaths luego pasa a getStaticProps en build time
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-  const pokemons151 = [...Array(151)].map((value, index) => `${index + 1}`);
+    const {data} = await pokeAPi.get<PokemonListResponse>('/pokemon?limit=151')
+    const pokemonNames: string[] = data.results.map(pokemon => pokemon.name)
 
   return {
-    paths: pokemons151.map((id) => ({
-      params: { id },
+    paths: pokemonNames.map((name) => ({
+      params: {pokemonName: name },
     })),
     //fallback nos permite admitir parametros que no han sido pre renderizados, en este caso esta dessativado
     // solo permitira parametros pre renderizados,
@@ -111,16 +112,19 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 // (se puede desestructurar pero por el ejemplo se dejo explicito)
 // tratar de hacerlo de la forma mas eficiente posible
 export const getStaticProps: GetStaticProps = async (context: any) => {
-  const { id } = context.params;
+  const { pokemonName } = context.params;
   // fetch data from api ( sin axios)
-  // const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  // const pokeData = (await res.json()) as Pokemon;
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+  const pokeData = (await res.json()) as Pokemon;
+  // optimizando la data para no alamacenar informacion no necesaria en el servidor
+  const  { id, name, sprites  } = pokeData
 
   return {
     props: {
-      //toma de forma mas optimizada la data del pokemon
-      pokemon: await getPokemonOptimizedInfo(id),
+      pokemon:{
+        id, name, sprites
+      }
     },
   };
 };
-export default PokemonDetail;
+export default PokemonByNamePage;
