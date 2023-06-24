@@ -6,22 +6,30 @@ import confetti from "canvas-confetti";
 import { Pokemon } from "../../interfaces";
 import { localStorageHandler } from "../../utils";
 import getPokemonOptimizedInfo from "../../utils/optimizePokemonInfo";
+import { redirect } from "next/dist/server/api-utils";
 
 interface Props {
   pokemon: Pokemon;
 }
 
 const PokemonDetail: NextPage<Props> = ({ pokemon }) => {
-
-  const [isInFavorites, setIsInFavorites] = useState(localStorageHandler.existInFavorites(pokemon.id))
+  const [isInFavorites, setIsInFavorites] = useState(
+    localStorageHandler.existInFavorites(pokemon.id)
+  );
 
   const onToggleFavorite = () => {
-    localStorageHandler.toggleFavorite(pokemon.id)
-    setIsInFavorites(!isInFavorites)
-    if(!isInFavorites){
-      confetti({ zIndex:999,particleCount:100,spread:160,angle:-100,origin:{x:1,y:0}})
+    localStorageHandler.toggleFavorite(pokemon.id);
+    setIsInFavorites(!isInFavorites);
+    if (!isInFavorites) {
+      confetti({
+        zIndex: 999,
+        particleCount: 100,
+        spread: 160,
+        angle: -100,
+        origin: { x: 1, y: 0 },
+      });
     }
-  }
+  };
 
   return (
     <Layout title={pokemon.name}>
@@ -50,7 +58,11 @@ const PokemonDetail: NextPage<Props> = ({ pokemon }) => {
                 {pokemon.name}
               </Text>
 
-              <Button color="gradient" ghost={!isInFavorites} onClick={onToggleFavorite}>
+              <Button
+                color="gradient"
+                ghost={!isInFavorites}
+                onClick={onToggleFavorite}
+              >
                 {isInFavorites ? "En favoritos" : "Guardar en favoritos"}
               </Button>
             </Card.Header>
@@ -102,8 +114,9 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
       params: { id },
     })),
     //fallback nos permite admitir parametros que no han sido pre renderizados, en este caso esta dessativado
-    // solo permitira parametros pre renderizados,
-    fallback: false,
+    // false -> solo permitira parametros pre renderizados,
+    // 'blocking' -> permitira parametros que no han sido pre renderizados
+    fallback: "blocking",
   };
 };
 
@@ -112,15 +125,27 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 // tratar de hacerlo de la forma mas eficiente posible
 export const getStaticProps: GetStaticProps = async (context: any) => {
   const { id } = context.params;
-  // fetch data from api ( sin axios)
-  // const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  // const pokeData = (await res.json()) as Pokemon;
+
+  // se valida que el pokemon existe si no existe se hace una redireccion a la pagina principal
+  //  utilizando el objeto de next.js para hacerlo mas eficienteredirect 
+  // permante es una propiedad para indicarle a los bots de google que no indexe mas esta pagina
+  //porque ya no existe, en este caso se desactiva pq puede que luego se agreguie ese pokemon
+  const pokemon = await getPokemonOptimizedInfo(id);
+  if (!pokemon) {
+    return{
+      redirect:{
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
 
   return {
     props: {
       //toma de forma mas optimizada la data del pokemon
-      pokemon: await getPokemonOptimizedInfo(id),
+      pokemon,
     },
+    revalidate: 86400, // cada dia se vuelve a generar el html con la 1ra peticion
   };
 };
 export default PokemonDetail;

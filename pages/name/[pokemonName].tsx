@@ -104,7 +104,7 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
     })),
     //fallback nos permite admitir parametros que no han sido pre renderizados, en este caso esta dessativado
     // solo permitira parametros pre renderizados,
-    fallback: false,
+    fallback: 'blocking',
   };
 };
 
@@ -116,7 +116,16 @@ export const getStaticProps: GetStaticProps = async (context: any) => {
   // fetch data from api ( sin axios)
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
   const pokeData = (await res.json()) as Pokemon;
-  // optimizando la data para no alamacenar informacion no necesaria en el servidor
+  
+  if(!pokeData.id){
+    return {
+      redirect:{
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
   const  { id, name, sprites  } = pokeData
 
   return {
